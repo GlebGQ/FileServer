@@ -34,12 +34,13 @@ namespace FileServer.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> LogIn(LoginRequest loginRequest)
         {
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
             if (user != null)
             {
-                var signInResult = await _signinManager.PasswordSignInAsync(user, loginRequest.Password, false, false);
+                var signInResult = await _signinManager.CheckPasswordSignInAsync(user, loginRequest.Password, false);
                 if (signInResult.Succeeded)
                 {
                     return Ok(_generator.GenerateToken(user));
@@ -51,7 +52,7 @@ namespace FileServer.Controllers
 
         [HttpPost("get-session-key")]
         [Authorize]
-        public async Task<IActionResult> GenerateSessionKey(GenerateSessionKeyRequest request)
+        public async Task<IActionResult> GenerateSessionKey([FromBody]GenerateSessionKeyRequest request)
         {
             var clientId = request.ClientId;
             var clientPublicKey = request.ClientPublicKey;

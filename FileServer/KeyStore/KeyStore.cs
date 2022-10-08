@@ -29,14 +29,14 @@ namespace FileServer.KeyStore
             return null;
         }
 
-        public void AddSessionKey(Guid clientId, byte[] sessionKey)
+        public void AddOrUpdateSessionKey(Guid clientId, byte[] sessionKey)
         {
             var sessionKeyWrapper = new SessionKeyWrapper
             {
                 ExpirationDateTime = DateTime.Now.AddMinutes(1),
                 SessionKey = sessionKey
             };
-            SessionKeys.TryAdd(clientId, sessionKeyWrapper);
+            SessionKeys.AddOrUpdate(clientId, sessionKeyWrapper, (_,_) => sessionKeyWrapper);
         }
     }
 }

@@ -16,7 +16,6 @@ namespace FileServer.Services
 
         public GenerateSessionKeyResponse GenerateSessionKey(Guid clientId, byte[] clientPublicKey)
         {
-            if(_keyStore.)
             var response = new GenerateSessionKeyResponse();
             using var rsaKey = new RSACryptoServiceProvider();
             rsaKey.ImportCspBlob(clientPublicKey);
@@ -27,7 +26,7 @@ namespace FileServer.Services
             response.IV = aes.IV;
             response.EncryptedSessionKey = encryptedSessionKey;
 
-            _keyStore.AddSessionKey(clientId, sessionKey);
+            _keyStore.AddOrUpdateSessionKey(clientId, sessionKey);
 
             return response;
         }
