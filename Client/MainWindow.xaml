@@ -16,16 +16,16 @@
         <Label Content="Text Name:" HorizontalAlignment="Left" Margin="48,59,0,0" VerticalAlignment="Top" Width="76" Height="27"/>
         <TextBox x:Name="TextName" HorizontalAlignment="Left" Margin="129,64,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
 
-        <Button Content="Get Text" HorizontalAlignment="Left" Margin="48,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.192,0.062" Width="76"/>
-        <Button Content="Update Text" HorizontalAlignment="Left" Margin="160,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
-        <Button Content="Delete Text" HorizontalAlignment="Left" Margin="286,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.247,0.142" Width="94"/>
+        <Button Content="Get Text" Click="GetText_OnClick" HorizontalAlignment="Left" Margin="48,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.192,0.062" Width="76"/>
+        <Button Content="Update Text" Click="UpdateText_OnClick" HorizontalAlignment="Left" Margin="160,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
+        <Button Content="Delete Text" Click="DeleteText_OnClick" HorizontalAlignment="Left" Margin="286,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.247,0.142" Width="94"/>
 
         <Label Content="User Login:" HorizontalAlignment="Left" Margin="533,21,0,0" VerticalAlignment="Top"/>
         <Label Content="User Name:" HorizontalAlignment="Left" Margin="513,52,0,0" VerticalAlignment="Top" Width="78"/>
         <Label Content="Password:" HorizontalAlignment="Left" Margin="513,78,0,0" VerticalAlignment="Top" Width="78"/>
-        <TextBox HorizontalAlignment="Left" Margin="602,56,0,0" TextWrapping="Wrap" Text="alex@gmail.com" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Margin="602,82,0,0" TextWrapping="Wrap" Text="alexpassword" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Log in" HorizontalAlignment="Left" Margin="516,114,0,0" VerticalAlignment="Top" Width="66"/>
-        <Button Content="Create Encrypted Connection" HorizontalAlignment="Left" Margin="615,114,0,0" VerticalAlignment="Top" Width="162"/>
+        <TextBox x:Name="UserName" HorizontalAlignment="Left" Margin="602,56,0,0" TextWrapping="Wrap" Text="alex@gmail.com" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="UserPassword" HorizontalAlignment="Left" Margin="602,82,0,0" TextWrapping="Wrap" Text="alexpassword" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Log in" Click="LogIn_OnClick" HorizontalAlignment="Left" Margin="516,114,0,0" VerticalAlignment="Top" Width="66"/>
+        <Button Content="Create Encrypted Connection" Click="CreateConnection_OnClick" HorizontalAlignment="Left" Margin="615,114,0,0" VerticalAlignment="Top" Width="162"/>
     </Grid>
 </Window>
