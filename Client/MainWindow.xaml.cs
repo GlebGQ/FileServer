@@ -56,13 +56,13 @@ namespace Client
             var response = await _userService.LogIn(UserName.Text, UserPassword.Text);
             if (_textService is TextService textService)
             {
-                if (response.token != string.Empty)
+                if (response.Token != string.Empty)
                 {
-                    textService.SetAuthorizationToken(response.token);
+                    textService.SetAuthorizationToken(response.Token);
                 }
             }
 
-            MessageBox.Show(response.message);
+            MessageBox.Show(response.Message);
         }
 
         private async Task CreateConnection_OnClick(object sender, RoutedEventArgs e)
@@ -70,12 +70,12 @@ namespace Client
             var response = await _userService.CreateConnection(_appIdentifier);
             if (_textService is TextService textService)
             {
-                if (response.sessionKeyResponse is not null)
+                if (response.SessionKeyResponse is not null)
                 {
-                    textService.SetUpAes(response.sessionKeyResponse);
+                    textService.SetUpAes(response.SessionKeyResponse);
                 }
             }
-            MessageBox.Show(response.message);
+            MessageBox.Show(response.Message);
         }
     }
 }
