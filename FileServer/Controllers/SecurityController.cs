@@ -50,16 +50,16 @@ namespace FileServer.Controllers
             return Unauthorized();
         }
 
-        [HttpPost("get-session-key")]
+        [HttpPost("generate-session-key")]
         [Authorize]
-        public async Task<IActionResult> GenerateSessionKey([FromBody]GenerateSessionKeyRequest request)
+        public IActionResult GenerateSessionKey([FromBody]GenerateSessionKeyRequest request)
         {
             var clientId = request.ClientId;
             var clientPublicKey = request.ClientPublicKey;
 
             var response = _securityService.GenerateSessionKey(clientId, clientPublicKey);
 
-            return Unauthorized();
+            return Ok(response);
         }
     }
 }

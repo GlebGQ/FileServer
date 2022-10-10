@@ -15,12 +15,11 @@ namespace Client.Services
     {
         private readonly HttpClient _httpClient;
 
-        public UserService(string baseUserServiceUri)
+        public Guid ClientId { get; set; }
+
+        public UserService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = new HttpClient()
-            {
-                BaseAddress = new Uri(baseUserServiceUri)
-            };
+            _httpClient = httpClientFactory.CreateClient("WpfClient");
         }
 
         public async Task<LoginResponse> LogIn(string userEmail, string userPassword)
@@ -49,7 +48,7 @@ namespace Client.Services
             };
         }
 
-        public async Task<CreateConnectionResponse> CreateConnection(Guid appIdentifier)
+        public async Task<CreateConnectionResponse> CreateConnection()
         {
             if (_httpClient.DefaultRequestHeaders.Authorization is null)
             {
@@ -60,13 +59,14 @@ namespace Client.Services
                 };
             }
 
+            ClientId = Guid.NewGuid();
             using var rsaKey = new RSACryptoServiceProvider();
             byte[] key = rsaKey.ExportCspBlob(false);
 
-            var data = JsonConvert.SerializeObject(new { ClientId = appIdentifier, ClientPublicKey = key });
+            var data = JsonConvert.SerializeObject(new {ClientId, ClientPublicKey = key });
             var connectionContent = new StringContent(data, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("/api/Security/get-session-key", connectionContent);
+            var response = await _httpClient.PostAsync("/api/Security/generate-session-key", connectionContent);
             if (!response.IsSuccessStatusCode)
             {
                 return new CreateConnectionResponse

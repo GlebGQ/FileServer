@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Client.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 
 namespace Client
 {
@@ -21,37 +24,39 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Guid _appIdentifier;
         private readonly IUserService _userService;
         private readonly ITextService _textService;
 
         public MainWindow()
         {
-            _userService = new UserService("https://localhost:7053");
-            _textService = new TextService("https://localhost:7053");
-            _appIdentifier = Guid.NewGuid();
+            var serviceProvider = new ServiceCollection()
+                .AddHttpClient("WpfClient", client => client.BaseAddress = new Uri("https://localhost:7053"))
+                .Services.BuildServiceProvider();
+            var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+            _userService = new UserService(httpClientFactory);
+            _textService = new TextService(_userService, httpClientFactory);
             InitializeComponent();
         }
 
-        private async Task GetText_OnClick(object sender, RoutedEventArgs e)
+        private async void GetText_OnClick(object sender, RoutedEventArgs e)
         {
             var responseMessage = await _textService.GetText(TextName.Text);
             MessageBox.Show(responseMessage);
         }
 
-        private async Task UpdateText_OnClick(object sender, RoutedEventArgs e)
+        private async void UpdateText_OnClick(object sender, RoutedEventArgs e)
         {
             var responseMessage = await _textService.UpdateText(TextName.Text, DecryptedText.Text);
             MessageBox.Show(responseMessage);
         }
 
-        private async Task DeleteText_OnClick(object sender, RoutedEventArgs e)
+        private async void DeleteText_OnClick(object sender, RoutedEventArgs e)
         {
             var responseMessage = await _textService.DeleteText(TextName.Text);
             MessageBox.Show(responseMessage);
         }
 
-        private async Task LogIn_OnClick(object sender, RoutedEventArgs e)
+        private async void LogIn_OnClick(object sender, RoutedEventArgs e)
         {
             var response = await _userService.LogIn(UserName.Text, UserPassword.Text);
             if (_textService is TextService textService)
@@ -65,9 +70,9 @@ namespace Client
             MessageBox.Show(response.Message);
         }
 
-        private async Task CreateConnection_OnClick(object sender, RoutedEventArgs e)
+        private async void CreateConnection_OnClick(object sender, RoutedEventArgs e)
         {
-            var response = await _userService.CreateConnection(_appIdentifier);
+            var response = await _userService.CreateConnection();
             if (_textService is TextService textService)
             {
                 if (response.SessionKeyResponse is not null)
