@@ -33,7 +33,7 @@ namespace Client.Services
             var regResponse = await _httpClient.PostAsync("/api/Security/login", loginContent);
             if (!regResponse.IsSuccessStatusCode)
             {
-                return $"Login failed! Status code: {regResponse.StatusCode}";
+                return $"Login failed! Status code: {await regResponse.Content.ReadAsStringAsync()}";
             }
 
             var token = await regResponse.Content.ReadAsStringAsync();
@@ -59,7 +59,7 @@ namespace Client.Services
             var response = await _httpClient.PostAsync("/api/Security/generate-session-key", connectionContent);
             if (!response.IsSuccessStatusCode)
             {
-                return $"Connection failed! Status code: {response.StatusCode}";
+                return $"Connection failed! Status code: {await response.Content.ReadAsStringAsync()}";
             }
 
             var generateSessionKeyResponse = await GetGenerateSessionKeyResponse(response, rsaKey);

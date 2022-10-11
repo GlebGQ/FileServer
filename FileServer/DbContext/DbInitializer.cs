@@ -13,8 +13,14 @@ namespace FileServer.DbContext
                     UserName = "alex@gmail.com",
                     Email = "alex@gmail.com"
                 };
+                var ivan = new IdentityUser
+                {
+                    UserName = "ivan@gmail.com",
+                    Email = "ivan@gmail.com"
+                };
 
-                var result = await userManager.CreateAsync(alex, "alexpassword").ConfigureAwait(false);
+                var result = await userManager.CreateAsync(ivan, "ivanpassword").ConfigureAwait(false);
+                result = await userManager.CreateAsync(alex, "alexpassword").ConfigureAwait(false);
             }
         }
     }

@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Client.Models;
 using Aes = System.Runtime.Intrinsics.Arm.Aes;
 
@@ -34,12 +35,12 @@ namespace Client.Services
         {
             var encryptedFileName = await _aesSecurityService.EncryptTextAsync(textName);
             var base64EncryptedFileName = Convert.ToBase64String(encryptedFileName, 0, encryptedFileName.Length);
-            base64EncryptedFileName = base64EncryptedFileName.Replace("+", "%2B");
+            base64EncryptedFileName = HttpUtility.UrlEncode(base64EncryptedFileName);
 
             var response = await _httpClient.GetAsync($"api/Text/get-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}");
             if (!response.IsSuccessStatusCode)
             {
-                return $"Text didn't get! Status code: {response.StatusCode}";
+                return $"Text didn't get! Status code: {response.StatusCode} { await response.Content.ReadAsStringAsync()}";
             }
 
             EncryptedText = await response.Content.ReadAsStringAsync();
@@ -53,11 +54,12 @@ namespace Client.Services
         {
             var encryptedFileName = await _aesSecurityService.EncryptTextAsync(textName);
             var base64EncryptedFileName = Convert.ToBase64String(encryptedFileName, 0, encryptedFileName.Length);
+            base64EncryptedFileName = HttpUtility.UrlEncode(base64EncryptedFileName);
 
             var response = await _httpClient.DeleteAsync($"api/Text/delete-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}");
             if (!response.IsSuccessStatusCode)
             {
-                return $"Text didn't delete! Status code: {response.StatusCode}";
+                return $"Text didn't delete! Status code: {response.StatusCode} {await response.Content.ReadAsStringAsync()}";
             }
 
             return "Text deleted!";
@@ -67,13 +69,14 @@ namespace Client.Services
         {
             var encryptedFileName = await _aesSecurityService.EncryptTextAsync(textName);
             var base64EncryptedFileName = Convert.ToBase64String(encryptedFileName, 0, encryptedFileName.Length);
+            base64EncryptedFileName = HttpUtility.UrlEncode(base64EncryptedFileName);
 
             var encryptedText = await _aesSecurityService.EncryptTextAsync(DecryptedText);
             var content = new ByteArrayContent(encryptedText);
             var response = await _httpClient.PutAsync($"api/Text/edit-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}", content);
             if (!response.IsSuccessStatusCode)
             {
-                return $"Text didn't edit! Status code: {response.StatusCode}";
+                return $"Text didn't edit! Status code: {response.StatusCode} {await response.Content.ReadAsStringAsync()}";
             }
 
             return "Text edited";

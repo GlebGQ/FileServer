@@ -69,7 +69,7 @@ namespace Client
 
         private async void LogIn_OnClick(object sender, RoutedEventArgs e)
         {
-            var message = await _userService.LogInAsync(UserName.Text, UserPassword.Text);
+            var message = await _userService.LogInAsync(UserName.Text, UserPassword.Password);
             MessageBox.Show(message);
         }
 

@@ -8,24 +8,23 @@
         Title="MainWindow" Height="450" Width="800"
         ResizeMode="CanMinimize">
     <Grid>
-        <TextBox x:Name="DecryptedText" HorizontalAlignment="Left" Margin="427,204,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Height="200"/>
-        <TextBox x:Name="EncryptedText" HorizontalAlignment="Left" Margin="30,204,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Height="200"/>
+        <TextBox x:Name="DecryptedText" HorizontalAlignment="Left" Margin="410,204,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Height="200"/>
+        <TextBox x:Name="EncryptedText" HorizontalAlignment="Left" Margin="20,204,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Height="200"/>
         <Label Content="Encrypted Text:" HorizontalAlignment="Left" Margin="48,164,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.161,-2.009" Width="94"/>
         <Label Content="Decrypted Text:" HorizontalAlignment="Left" Margin="450,164,0,0" VerticalAlignment="Top" Width="132"/>
 
-        <Label Content="Text Name:" HorizontalAlignment="Left" Margin="48,59,0,0" VerticalAlignment="Top" Width="76" Height="27"/>
-        <TextBox x:Name="TextName" HorizontalAlignment="Left" Margin="129,64,0,0" TextWrapping="Wrap" Text="TextBox.txt" VerticalAlignment="Top" Width="120"/>
+        <Label Content="File Name:" HorizontalAlignment="Left" Margin="20,59,0,0" VerticalAlignment="Top" Width="76" Height="27"/>
+        <TextBox x:Name="TextName" HorizontalAlignment="Left" Margin="95,64,0,0" TextWrapping="Wrap" Text="TextBox.txt" VerticalAlignment="Top" Width="120"/>
 
-        <Button Content="Get Text" Click="GetText_OnClick" HorizontalAlignment="Left" Margin="48,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.192,0.062" Width="76"/>
-        <Button Content="Edit Text" Click="EditText_OnClick" HorizontalAlignment="Left" Margin="160,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
-        <Button Content="Delete Text" Click="DeleteText_OnClick" HorizontalAlignment="Left" Margin="286,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.247,0.142" Width="94"/>
+        <Button Content="Get Text" Click="GetText_OnClick" HorizontalAlignment="Left" Margin="20,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.192,0.062" Width="76"/>
+        <Button Content="Update Text" Click="EditText_OnClick" HorizontalAlignment="Left" Margin="144,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
+        <Button Content="Delete file" Click="DeleteText_OnClick" HorizontalAlignment="Left" Margin="276,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.247,0.142" Width="94"/>
 
-        <Label Content="User Login:" HorizontalAlignment="Left" Margin="533,21,0,0" VerticalAlignment="Top"/>
-        <Label Content="User Name:" HorizontalAlignment="Left" Margin="513,52,0,0" VerticalAlignment="Top" Width="78"/>
-        <Label Content="Password:" HorizontalAlignment="Left" Margin="513,78,0,0" VerticalAlignment="Top" Width="78"/>
-        <TextBox x:Name="UserName" HorizontalAlignment="Left" Margin="602,56,0,0" TextWrapping="Wrap" Text="alex@gmail.com" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="UserPassword" HorizontalAlignment="Left" Margin="602,82,0,0" TextWrapping="Wrap" Text="alexpassword" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Log in" Click="LogIn_OnClick" HorizontalAlignment="Left" Margin="516,114,0,0" VerticalAlignment="Top" Width="66"/>
-        <Button Content="Create Encrypted Connection" Click="CreateConnection_OnClick" HorizontalAlignment="Left" Margin="615,114,0,0" VerticalAlignment="Top" Width="162"/>
+        <Label Content="User Name:" HorizontalAlignment="Left" Margin="510,52,0,0" VerticalAlignment="Top" Width="78"/>
+        <Label Content="Password:" HorizontalAlignment="Left" Margin="510,78,0,0" VerticalAlignment="Top" Width="78"/>
+        <TextBox x:Name="UserName" HorizontalAlignment="Left" Margin="585,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="175"/>
+        <PasswordBox x:Name="UserPassword" HorizontalAlignment="Left" Margin="585,82,0,0" VerticalAlignment="Top" Width="175"/>
+        <Button Content="Log in" Click="LogIn_OnClick" HorizontalAlignment="Left" Margin="510,114,0,0" VerticalAlignment="Top" Width="66"/>
+        <Button Content="Create Encrypted Connection" Click="CreateConnection_OnClick" HorizontalAlignment="Left" Margin="585,114,0,0" VerticalAlignment="Top" Width="175"/>
     </Grid>
 </Window>

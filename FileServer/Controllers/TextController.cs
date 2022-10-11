@@ -26,11 +26,6 @@ namespace FileServer.Controllers
         {
             var encryptedTextName = Convert.FromBase64String(fileContentRequest.Base64EncryptedTextName);
             var textName = await _securityService.DecryptTextAsync(encryptedTextName, fileContentRequest.ClientId).ConfigureAwait(false);
-            if (!System.IO.File.Exists($"files\\{textName}"))
-            {
-                return;
-            }
-
             await using var fileStream = new FileStream($"files\\{textName}", FileMode.Open);
             await _securityService.EncryptTextAsync(fileStream, HttpContext.Response.Body, fileContentRequest.ClientId);
         }
@@ -40,12 +35,8 @@ namespace FileServer.Controllers
         {
             var encryptedTextName = Convert.FromBase64String(fileContentRequest.Base64EncryptedTextName);
             var textName = await _securityService.DecryptTextAsync(encryptedTextName, fileContentRequest.ClientId).ConfigureAwait(false);
-            if (!System.IO.File.Exists($"files\\{textName}"))
-            {
-                return BadRequest("File Not Found");
-            }
 
-            await using var fileStream = new FileStream($"files\\{textName}", FileMode.Create);
+            await using var fileStream = new FileStream($"files\\{textName}", FileMode.OpenOrCreate);
             await _securityService.DecryptTextAsync(HttpContext.Request.Body, fileStream, fileContentRequest.ClientId);
             return Ok("File edited successfully");
         }
@@ -55,11 +46,6 @@ namespace FileServer.Controllers
         {
             var encryptedText = Convert.FromBase64String(fileContentRequest.Base64EncryptedTextName);
             var textName = await _securityService.DecryptTextAsync(encryptedText, fileContentRequest.ClientId).ConfigureAwait(false);
-
-            if (!System.IO.File.Exists($"files\\{textName}"))
-            {
-                return BadRequest("File Not Found");
-            }
 
             System.IO.File.Delete($"files\\{textName}");
             return Ok("File deleted successfully");

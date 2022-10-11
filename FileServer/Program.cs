@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FileServer.Infrastructure;
 using FileServer.Services;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace FileServer
 {
@@ -65,6 +68,7 @@ namespace FileServer
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseHttpsRedirection();
 
 
