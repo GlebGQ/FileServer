@@ -7,7 +7,7 @@ namespace Client.Services;
 internal interface IUserService
 {
     public Guid ClientId { get; set; }
-    public Task<LoginResponse> LogIn(string userEmail, string userPassword);
+    public Task<string> LogInAsync(string userEmail, string userPassword);
 
-    public Task<CreateConnectionResponse> CreateConnection();
+    public Task<string> CreateConnectionAsync();
 }

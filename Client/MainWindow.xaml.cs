@@ -33,54 +33,50 @@ namespace Client
                 .AddHttpClient("WpfClient", client => client.BaseAddress = new Uri("https://localhost:7053"))
                 .Services.BuildServiceProvider();
             var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
-            _userService = new UserService(httpClientFactory);
-            _textService = new TextService(_userService, httpClientFactory);
+            //var aesSecurityService = serviceProvider.GetService<IAesSecurityService>();
+
+
+            IAesSecurityService aesSecurityService = new AesSecurityService();
+            var httpClient = new HttpClient()
+            {
+                BaseAddress = new Uri("https://localhost:7053"),
+            };
+            _userService = new UserService(httpClient, aesSecurityService);
+            _textService = new TextService(_userService, httpClient, aesSecurityService);
             InitializeComponent();
         }
 
         private async void GetText_OnClick(object sender, RoutedEventArgs e)
         {
-            var responseMessage = await _textService.GetText(TextName.Text);
+            var responseMessage = await _textService.GetTextAsync(TextName.Text);
+            EncryptedText.Text = _textService.EncryptedText;
+            DecryptedText.Text = _textService.DecryptedText;
             MessageBox.Show(responseMessage);
         }
 
-        private async void UpdateText_OnClick(object sender, RoutedEventArgs e)
+        private async void EditText_OnClick(object sender, RoutedEventArgs e)
         {
-            var responseMessage = await _textService.UpdateText(TextName.Text, DecryptedText.Text);
+            _textService.DecryptedText = DecryptedText.Text;
+            var responseMessage = await _textService.EditTextAsync(TextName.Text, DecryptedText.Text);
             MessageBox.Show(responseMessage);
         }
 
         private async void DeleteText_OnClick(object sender, RoutedEventArgs e)
         {
-            var responseMessage = await _textService.DeleteText(TextName.Text);
+            var responseMessage = await _textService.DeleteTextAsync(TextName.Text);
             MessageBox.Show(responseMessage);
         }
 
         private async void LogIn_OnClick(object sender, RoutedEventArgs e)
         {
-            var response = await _userService.LogIn(UserName.Text, UserPassword.Text);
-            if (_textService is TextService textService)
-            {
-                if (response.Token != string.Empty)
-                {
-                    textService.SetAuthorizationToken(response.Token);
-                }
-            }
-
-            MessageBox.Show(response.Message);
+            var message = await _userService.LogInAsync(UserName.Text, UserPassword.Text);
+            MessageBox.Show(message);
         }
 
         private async void CreateConnection_OnClick(object sender, RoutedEventArgs e)
         {
-            var response = await _userService.CreateConnection();
-            if (_textService is TextService textService)
-            {
-                if (response.SessionKeyResponse is not null)
-                {
-                    textService.SetUpAes(response.SessionKeyResponse);
-                }
-            }
-            MessageBox.Show(response.Message);
+            var message = await _userService.CreateConnectionAsync();
+            MessageBox.Show(message);
         }
     }
 }

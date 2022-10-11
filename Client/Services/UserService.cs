@@ -13,16 +13,18 @@ namespace Client.Services
 {
     internal class UserService : IUserService, IDisposable
     {
+        private readonly IAesSecurityService _aesSecurityService;
         private readonly HttpClient _httpClient;
 
         public Guid ClientId { get; set; }
 
-        public UserService(IHttpClientFactory httpClientFactory)
+        public UserService(HttpClient httpClient, IAesSecurityService aesSecurityService)
         {
-            _httpClient = httpClientFactory.CreateClient("WpfClient");
+            _aesSecurityService = aesSecurityService;
+            _httpClient = httpClient;
         }
 
-        public async Task<LoginResponse> LogIn(string userEmail, string userPassword)
+        public async Task<string> LogInAsync(string userEmail, string userPassword)
         {
             var loginRequest = new LoginRequest() { Email = userEmail, Password = userPassword };
             var jsonContent = JsonConvert.SerializeObject(loginRequest);
@@ -31,32 +33,20 @@ namespace Client.Services
             var regResponse = await _httpClient.PostAsync("/api/Security/login", loginContent);
             if (!regResponse.IsSuccessStatusCode)
             {
-                return new LoginResponse()
-                {
-                    Message = $"Login failed! Status code: {regResponse.StatusCode}",
-                    Token = string.Empty
-                };
+                return $"Login failed! Status code: {regResponse.StatusCode}";
             }
 
             var token = await regResponse.Content.ReadAsStringAsync();
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
-            return new LoginResponse()
-            {
-                Message = $"Login failed! Status code: {regResponse.StatusCode}",
-                Token = token
-            };
+            return $"Login successfully! JwtToken: {token}";
         }
 
-        public async Task<CreateConnectionResponse> CreateConnection()
+        public async Task<string> CreateConnectionAsync()
         {
             if (_httpClient.DefaultRequestHeaders.Authorization is null)
             {
-                return new CreateConnectionResponse
-                {
-                    Message = "Please LogIn first",
-                    SessionKeyResponse = null
-                };
+                return "Please Login first";
             }
 
             ClientId = Guid.NewGuid();
@@ -69,19 +59,12 @@ namespace Client.Services
             var response = await _httpClient.PostAsync("/api/Security/generate-session-key", connectionContent);
             if (!response.IsSuccessStatusCode)
             {
-                return new CreateConnectionResponse
-                {
-                    Message = $"Connection failed! Status code: {response.StatusCode}", 
-                    SessionKeyResponse = null
-                };
+                return $"Connection failed! Status code: {response.StatusCode}";
             }
 
-            var sessionKeyResponse = await GetGenerateSessionKeyResponse(response, rsaKey);
-            return new CreateConnectionResponse
-            {
-                Message = $"Connection established! Secret Key: {sessionKeyResponse.EncryptedSessionKey}",
-                SessionKeyResponse = sessionKeyResponse
-            };
+            var generateSessionKeyResponse = await GetGenerateSessionKeyResponse(response, rsaKey);
+            _aesSecurityService.SetAesConfiguration(generateSessionKeyResponse);
+            return $"Connection established! Secret Key: {Encoding.UTF8.GetString(generateSessionKeyResponse.EncryptedSessionKey)}";
         }
 
         public void Dispose()
@@ -97,13 +80,13 @@ namespace Client.Services
             using var streamReader = new StreamReader(contentStream);
             using var jsonReader = new JsonTextReader(streamReader);
             var serializer = new JsonSerializer();
-            var sessionKeyResponse = serializer.Deserialize<GenerateSessionKeyResponse>(jsonReader);
+            var generateSessionKeyResponse = serializer.Deserialize<GenerateSessionKeyResponse>(jsonReader);
 
             var keyDeformatter = new RSAOAEPKeyExchangeDeformatter(rsaKey);
-            sessionKeyResponse.EncryptedSessionKey = 
-                keyDeformatter.DecryptKeyExchange(sessionKeyResponse.EncryptedSessionKey);
+            generateSessionKeyResponse.EncryptedSessionKey = 
+                keyDeformatter.DecryptKeyExchange(generateSessionKeyResponse.EncryptedSessionKey);
 
-            return sessionKeyResponse;
+            return generateSessionKeyResponse;
         }
     }
 }
