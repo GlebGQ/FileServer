@@ -15,32 +15,49 @@ namespace Client.Services
 {
     internal class TextService : ITextService, IDisposable
     {
+        private readonly IUserService _userService;
         private readonly HttpClient _httpClient;
         private readonly AesCryptoServiceProvider _aes = new AesCryptoServiceProvider();
 
-        public TextService(string basePath)
+        public TextService(IUserService userService, IHttpClientFactory httpClientFactory)
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri(basePath);
+            _userService = userService;
+            _httpClient = httpClientFactory.CreateClient("WpfClient");
         }
 
         public string Text { get; private set; }
 
         public async Task<string> GetText(string textName)
         {
-            var response = await _httpClient.GetAsync($"api/Text/get-text?textName={textName}");
+            var encryptor = _aes.CreateEncryptor();
+
+            using var memoryStream = new MemoryStream();
+            await using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write, leaveOpen: true);
+            await using (var streamWriter = new StreamWriter(cryptoStream))
+            {
+                await streamWriter.WriteAsync(textName);
+            }
+            var encryptedFileName = memoryStream.ToArray();
+            var base64EncryptedFileName = Convert.ToBase64String(encryptedFileName, 0, encryptedFileName.Length);
+            //var queryParamsDictionary = new Dictionary<string, string>
+            //{
+            //    [nameof(base64EncryptedFileName)] = base64EncryptedFileName,
+            //    ["clientId"] = _userService.ClientId.ToString(),
+
+            //};
+            //using var encodedContent = new FormUrlEncodedContent(queryParamsDictionary);
+            //var params = await encodedContent.ReadAsStringAsync();
+            var response = await _httpClient.GetAsync($"api/Text/get-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}");
             if (!response.IsSuccessStatusCode)
             {
                 return $"Text didn't get! Status code: {response.StatusCode}";
             }
 
-            var encryptedText = await response.Content.ReadAsByteArrayAsync();
-            using MemoryStream plaintext = new MemoryStream();
-            await using CryptoStream cs = new CryptoStream(plaintext, _aes.CreateDecryptor(), CryptoStreamMode.Write);
-            cs.Write(encryptedText, 0, encryptedText.Length);
-            cs.Close();
+            var contentStream = await response.Content.ReadAsStreamAsync();
+            await using CryptoStream cs = new CryptoStream(contentStream, _aes.CreateDecryptor(), CryptoStreamMode.Read);
+            using var streamReader = new StreamReader(cs, Encoding.UTF8);
 
-            Text = Encoding.UTF8.GetString(plaintext.ToArray());
+            Text = await streamReader.ReadToEndAsync();
             return "Text got successfully!";
         }
 

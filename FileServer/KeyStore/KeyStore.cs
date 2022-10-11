@@ -18,7 +18,7 @@ namespace FileServer.KeyStore
             var exists = SessionKeys.TryGetValue(clientId, out var sessionKeyWrapper);
             if (exists)
             {
-                if (sessionKeyWrapper.ExpirationDateTime > DateTime.Now)
+                if (sessionKeyWrapper.ExpirationDateTime < DateTime.Now)
                 {
                     var isRemoved = SessionKeys.TryRemove(clientId, out sessionKeyWrapper);
                     return null;
@@ -29,12 +29,13 @@ namespace FileServer.KeyStore
             return null;
         }
 
-        public void AddOrUpdateSessionKey(Guid clientId, byte[] sessionKey)
+        public void AddOrUpdateSessionKey(Guid clientId, byte[] sessionKey, byte[] iv)
         {
             var sessionKeyWrapper = new SessionKeyWrapper
             {
-                ExpirationDateTime = DateTime.Now.AddMinutes(1),
-                SessionKey = sessionKey
+                ExpirationDateTime = DateTime.Now.AddMinutes(10),
+                SessionKey = sessionKey,
+                IV = iv,
             };
             SessionKeys.AddOrUpdate(clientId, sessionKeyWrapper, (_,_) => sessionKeyWrapper);
         }
