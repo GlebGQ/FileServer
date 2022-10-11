@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using Client.Models;
 using Newtonsoft.Json;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -50,10 +51,12 @@ namespace Client.Services
             }
 
             ClientId = Guid.NewGuid();
-            using var rsaKey = new RSACryptoServiceProvider();
-            byte[] key = rsaKey.ExportCspBlob(false);
+            using var ecdf = new ECDiffieHellmanCng();
+            ecdf.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+            ecdf.HashAlgorithm = CngAlgorithm.Sha256;
+            var clientPublicKey = ecdf.PublicKey.ToByteArray();
 
-            var data = JsonConvert.SerializeObject(new {ClientId, ClientPublicKey = key });
+            var data = JsonConvert.SerializeObject(new {ClientId, ClientPublicKey = clientPublicKey });
             var connectionContent = new StringContent(data, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("/api/Security/generate-session-key", connectionContent);
@@ -62,9 +65,15 @@ namespace Client.Services
                 return $"Connection failed! Status code: {await response.Content.ReadAsStringAsync()}";
             }
 
-            var generateSessionKeyResponse = await GetGenerateSessionKeyResponse(response, rsaKey);
-            _aesSecurityService.SetAesConfiguration(generateSessionKeyResponse);
-            return $"Connection established! Secret Key: {Encoding.UTF8.GetString(generateSessionKeyResponse.EncryptedSessionKey)}";
+            var contentStream = await response.Content.ReadAsStreamAsync();
+            var str = await response.Content.ReadAsStringAsync();
+            using var streamReader = new StreamReader(contentStream);
+            using var jsonReader = new JsonTextReader(streamReader);
+            var serializer = new JsonSerializer();
+            var generateSessionKeyResponse = serializer.Deserialize<GenerateSessionKeyResponse>(jsonReader);
+            var sessionKey = ecdf.DeriveKeyMaterial(CngKey.Import(generateSessionKeyResponse.PublicEcdfKey, CngKeyBlobFormat.EccPublicBlob));
+            _aesSecurityService.SetAesConfiguration(sessionKey, generateSessionKeyResponse.IV);
+            return $"Connection established! Secret Key: {Encoding.UTF8.GetString(sessionKey)}";
         }
 
         public void Dispose()
@@ -72,21 +81,16 @@ namespace Client.Services
             _httpClient.Dispose();
         }
 
-        private async Task<GenerateSessionKeyResponse> GetGenerateSessionKeyResponse(
+        private async Task<byte[]> GetGenerateSessionKeyResponse(
             HttpResponseMessage message,
-            RSACryptoServiceProvider rsaKey)
+            ECDiffieHellmanCng ecdf)
         {
             var contentStream = await message.Content.ReadAsStreamAsync();
             using var streamReader = new StreamReader(contentStream);
             using var jsonReader = new JsonTextReader(streamReader);
             var serializer = new JsonSerializer();
             var generateSessionKeyResponse = serializer.Deserialize<GenerateSessionKeyResponse>(jsonReader);
-
-            var keyDeformatter = new RSAOAEPKeyExchangeDeformatter(rsaKey);
-            generateSessionKeyResponse.EncryptedSessionKey = 
-                keyDeformatter.DecryptKeyExchange(generateSessionKeyResponse.EncryptedSessionKey);
-
-            return generateSessionKeyResponse;
+            return ecdf.DeriveKeyMaterial(CngKey.Import(generateSessionKeyResponse.PublicEcdfKey, CngKeyBlobFormat.EccPublicBlob));
         }
     }
 }

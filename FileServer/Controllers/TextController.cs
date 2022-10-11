@@ -36,7 +36,7 @@ namespace FileServer.Controllers
             var encryptedTextName = Convert.FromBase64String(fileContentRequest.Base64EncryptedTextName);
             var textName = await _securityService.DecryptTextAsync(encryptedTextName, fileContentRequest.ClientId).ConfigureAwait(false);
 
-            await using var fileStream = new FileStream($"files\\{textName}", FileMode.OpenOrCreate);
+            await using var fileStream = new FileStream($"files\\{textName}", FileMode.Create);
             await _securityService.DecryptTextAsync(HttpContext.Request.Body, fileStream, fileContentRequest.ClientId);
             return Ok("File edited successfully");
         }

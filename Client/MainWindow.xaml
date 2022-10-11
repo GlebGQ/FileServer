@@ -17,7 +17,7 @@
         <TextBox x:Name="TextName" HorizontalAlignment="Left" Margin="95,64,0,0" TextWrapping="Wrap" Text="TextBox.txt" VerticalAlignment="Top" Width="120"/>
 
         <Button Content="Get Text" Click="GetText_OnClick" HorizontalAlignment="Left" Margin="20,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.192,0.062" Width="76"/>
-        <Button Content="Update Text" Click="EditText_OnClick" HorizontalAlignment="Left" Margin="144,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
+        <Button Content="Update/Create Text" Click="EditText_OnClick" HorizontalAlignment="Left" Margin="130,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="115"/>
         <Button Content="Delete file" Click="DeleteText_OnClick" HorizontalAlignment="Left" Margin="276,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.247,0.142" Width="94"/>
 
         <Label Content="User Name:" HorizontalAlignment="Left" Margin="510,52,0,0" VerticalAlignment="Top" Width="78"/>
