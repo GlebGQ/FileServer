@@ -14,10 +14,10 @@
         <Label Content="Decrypted Text:" HorizontalAlignment="Left" Margin="450,164,0,0" VerticalAlignment="Top" Width="132"/>
 
         <Label Content="Text Name:" HorizontalAlignment="Left" Margin="48,59,0,0" VerticalAlignment="Top" Width="76" Height="27"/>
-        <TextBox x:Name="TextName" HorizontalAlignment="Left" Margin="129,64,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextName" HorizontalAlignment="Left" Margin="129,64,0,0" TextWrapping="Wrap" Text="TextBox.txt" VerticalAlignment="Top" Width="120"/>
 
         <Button Content="Get Text" Click="GetText_OnClick" HorizontalAlignment="Left" Margin="48,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.192,0.062" Width="76"/>
-        <Button Content="Update Text" Click="UpdateText_OnClick" HorizontalAlignment="Left" Margin="160,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
+        <Button Content="Edit Text" Click="EditText_OnClick" HorizontalAlignment="Left" Margin="160,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,-2.022" Width="90"/>
         <Button Content="Delete Text" Click="DeleteText_OnClick" HorizontalAlignment="Left" Margin="286,114,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.247,0.142" Width="94"/>
 
         <Label Content="User Login:" HorizontalAlignment="Left" Margin="533,21,0,0" VerticalAlignment="Top"/>

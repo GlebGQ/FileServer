@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace FileServer.Models.Request
 {
-    public class GetFileContentRequest
+    public class FileContentRequest
     {
         [BindRequired]
         public Guid ClientId { get; set; }
