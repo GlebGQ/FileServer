@@ -40,7 +40,7 @@ namespace Client.Services
             var response = await _httpClient.GetAsync($"api/Text/get-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}");
             if (!response.IsSuccessStatusCode)
             {
-                return $"Text didn't get! Status code: {response.StatusCode}";
+                return $"Text didn't delete! Status code: {response.StatusCode} {await response.Content.ReadAsStringAsync()}";
             }
 
             EncryptedText = await response.Content.ReadAsStringAsync();
@@ -59,7 +59,7 @@ namespace Client.Services
             var response = await _httpClient.DeleteAsync($"api/Text/delete-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}");
             if (!response.IsSuccessStatusCode)
             {
-                return $"Text didn't delete! Status code: {response.StatusCode}";
+                return $"Text didn't delete! Status code: {response.StatusCode} {await response.Content.ReadAsStringAsync()}";
             }
 
             return "Text deleted!";
@@ -76,7 +76,7 @@ namespace Client.Services
             var response = await _httpClient.PutAsync($"api/Text/edit-text?base64EncryptedTextName={base64EncryptedFileName}&clientId={_userService.ClientId}", content);
             if (!response.IsSuccessStatusCode)
             {
-                return $"Text didn't edit! Status code: {response.StatusCode}";
+                return $"Text didn't delete! Status code: {response.StatusCode} {await response.Content.ReadAsStringAsync()}";
             }
 
             return "Text edited";

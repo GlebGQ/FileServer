@@ -17,12 +17,12 @@ namespace FileServer.Services
 
         public GenerateSessionKeyResponse GenerateSessionKey(Guid clientId, byte[] clientPublicKey)
         {
-            using var ecdf = new ECDiffieHellmanCng();
-            ecdf.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
-            ecdf.HashAlgorithm = CngAlgorithm.Sha256;
-            var serverPublicKey = ecdf.PublicKey.ToByteArray();
+            using var ecdh = new ECDiffieHellmanCng();
+            ecdh.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+            ecdh.HashAlgorithm = CngAlgorithm.Sha256;
+            var serverPublicKey = ecdh.PublicKey.ToByteArray();
             CngKey clientKey = CngKey.Import(clientPublicKey, CngKeyBlobFormat.EccPublicBlob);
-            byte[] sessionKey = ecdf.DeriveKeyMaterial(clientKey);
+            byte[] sessionKey = ecdh.DeriveKeyMaterial(clientKey);
             using var aes = Aes.Create();
 
             var response = new GenerateSessionKeyResponse

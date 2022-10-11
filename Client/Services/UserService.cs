@@ -51,10 +51,10 @@ namespace Client.Services
             }
 
             ClientId = Guid.NewGuid();
-            using var ecdf = new ECDiffieHellmanCng();
-            ecdf.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
-            ecdf.HashAlgorithm = CngAlgorithm.Sha256;
-            var clientPublicKey = ecdf.PublicKey.ToByteArray();
+            using var ecdh = new ECDiffieHellmanCng();
+            ecdh.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+            ecdh.HashAlgorithm = CngAlgorithm.Sha256;
+            var clientPublicKey = ecdh.PublicKey.ToByteArray();
 
             var data = JsonConvert.SerializeObject(new {ClientId, ClientPublicKey = clientPublicKey });
             var connectionContent = new StringContent(data, Encoding.UTF8, "application/json");
@@ -71,7 +71,7 @@ namespace Client.Services
             using var jsonReader = new JsonTextReader(streamReader);
             var serializer = new JsonSerializer();
             var generateSessionKeyResponse = serializer.Deserialize<GenerateSessionKeyResponse>(jsonReader);
-            var sessionKey = ecdf.DeriveKeyMaterial(CngKey.Import(generateSessionKeyResponse.PublicEcdfKey, CngKeyBlobFormat.EccPublicBlob));
+            var sessionKey = ecdh.DeriveKeyMaterial(CngKey.Import(generateSessionKeyResponse.PublicEcdfKey, CngKeyBlobFormat.EccPublicBlob));
             _aesSecurityService.SetAesConfiguration(sessionKey, generateSessionKeyResponse.IV);
             return $"Connection established! Secret Key: {Encoding.UTF8.GetString(sessionKey)}";
         }
@@ -79,18 +79,6 @@ namespace Client.Services
         public void Dispose()
         {
             _httpClient.Dispose();
-        }
-
-        private async Task<byte[]> GetGenerateSessionKeyResponse(
-            HttpResponseMessage message,
-            ECDiffieHellmanCng ecdf)
-        {
-            var contentStream = await message.Content.ReadAsStreamAsync();
-            using var streamReader = new StreamReader(contentStream);
-            using var jsonReader = new JsonTextReader(streamReader);
-            var serializer = new JsonSerializer();
-            var generateSessionKeyResponse = serializer.Deserialize<GenerateSessionKeyResponse>(jsonReader);
-            return ecdf.DeriveKeyMaterial(CngKey.Import(generateSessionKeyResponse.PublicEcdfKey, CngKeyBlobFormat.EccPublicBlob));
         }
     }
 }

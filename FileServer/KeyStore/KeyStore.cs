@@ -33,7 +33,7 @@ namespace FileServer.KeyStore
         {
             var sessionKeyWrapper = new SessionKeyWrapper
             {
-                ExpirationDateTime = DateTime.Now.AddMinutes(5),
+                ExpirationDateTime = DateTime.Now.AddMinutes(2),
                 SessionKey = sessionKey,
                 IV = iv,
             };
