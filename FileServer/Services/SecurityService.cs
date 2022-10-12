@@ -17,15 +17,19 @@ namespace FileServer.Services
 
         public GenerateSessionKeyResponse GenerateSessionKey(Guid clientId, byte[] clientPublicKey)
         {
-            var response = new GenerateSessionKeyResponse();
-            using var rsaKey = new RSACryptoServiceProvider();
-            rsaKey.ImportCspBlob(clientPublicKey);
+            using var ecdh = new ECDiffieHellmanCng();
+            ecdh.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+            ecdh.HashAlgorithm = CngAlgorithm.Sha256;
+            var serverPublicKey = ecdh.PublicKey.ToByteArray();
+            CngKey clientKey = CngKey.Import(clientPublicKey, CngKeyBlobFormat.EccPublicBlob);
+            byte[] sessionKey = ecdh.DeriveKeyMaterial(clientKey);
             using var aes = Aes.Create();
-            var sessionKey = aes.Key;
-            var keyFormatter = new RSAOAEPKeyExchangeFormatter(rsaKey);
-            var encryptedSessionKey = keyFormatter.CreateKeyExchange(sessionKey, typeof(Aes));
-            response.IV = aes.IV;
-            response.EncryptedSessionKey = encryptedSessionKey;
+
+            var response = new GenerateSessionKeyResponse
+            {
+                IV = aes.IV,
+                PublicEcdfKey = serverPublicKey
+            };
 
             _keyStore.AddOrUpdateSessionKey(clientId, sessionKey, aes.IV);
 
@@ -57,8 +61,7 @@ namespace FileServer.Services
             using var aes = Aes.Create();
             aes.Key = sessionKeyWrapper.SessionKey;
             aes.IV = sessionKeyWrapper.IV;
-
-            //Todo may be not working
+            
             var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
             await using var encryptStream = new CryptoStream(input, decryptor, CryptoStreamMode.Read);
             await encryptStream.CopyToAsync(output).ConfigureAwait(false);

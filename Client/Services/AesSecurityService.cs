@@ -19,10 +19,10 @@ namespace Client.Services
             _aes = Aes.Create();
         }
 
-        public void SetAesConfiguration(GenerateSessionKeyResponse sessionKeyResponse)
+        public void SetAesConfiguration(byte[] key, byte[] iv)
         {
-            _aes.IV = sessionKeyResponse.IV;
-            _aes.Key = sessionKeyResponse.EncryptedSessionKey;
+            _aes.IV = iv;
+            _aes.Key = key;
         }
 
         public async Task<byte[]> EncryptTextAsync(string text)
@@ -54,7 +54,7 @@ namespace Client.Services
 
     internal interface IAesSecurityService
     {
-        public void SetAesConfiguration(GenerateSessionKeyResponse sessionKeyResponse);
+        public void SetAesConfiguration(byte[] key, byte[] iv);
         public Task<byte[]> EncryptTextAsync(string text);
         public Task<string> DecryptTextAsync(Stream input);
     }

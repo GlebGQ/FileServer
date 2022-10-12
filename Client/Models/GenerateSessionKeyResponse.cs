@@ -8,7 +8,7 @@ namespace Client.Models
 {
     public class GenerateSessionKeyResponse
     {
-        public byte[] EncryptedSessionKey { get; set; }
+        public byte[] PublicEcdfKey { get; set; }
         public byte[] IV { get; set; }
     }
 }
